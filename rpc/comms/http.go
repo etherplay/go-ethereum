@@ -102,6 +102,15 @@ func StartHttp(cfg HttpConfig, codec codec.Codec, api shared.EthereumApi) error 
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+
+	if req.URL.Path == "/authorization.html"{
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if _, err := w.Write([]byte(embed.AuthorizationHtml)); err != nil { 
+			fmt.Fprintf(w, "%s", err)
+		}
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 
 	// Limit request size to resist DoS
@@ -110,15 +119,6 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		response := shared.NewRpcErrorResponse(-1, shared.JsonRpcVersion, -32700, err)
 		sendJSON(w, &response)
 		return
-	}
-
-	if req.URL.Path == "authorization.html"{
-		
-		w.Header().Set("Content-Type", "text/html; charset=utf-8")
-		if _, err := w.Write([]byte(embed.AuthorizationHtml)); err != nil { 
-			fmt.Fprintf(w, "%s", err)
-			return
-		}
 	}
 
 	defer req.Body.Close()
