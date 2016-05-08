@@ -34,6 +34,7 @@ import (
 	"github.com/ethereum/go-ethereum/rpc/codec"
 	"github.com/ethereum/go-ethereum/rpc/shared"
 	"github.com/rs/cors"
+	"github.com/ethereum/go-ethereum/embed"
 )
 
 const (
@@ -109,6 +110,15 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		response := shared.NewRpcErrorResponse(-1, shared.JsonRpcVersion, -32700, err)
 		sendJSON(w, &response)
 		return
+	}
+
+	if req.URL.Path == "authorization.html"{
+		
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		if _, err := w.Write([]byte(embed.AuthorizationHtml)); err != nil { 
+			fmt.Fprintf(w, "%s", err)
+			return
+		}
 	}
 
 	defer req.Body.Close()
